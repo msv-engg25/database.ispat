@@ -9,7 +9,7 @@ const nodemailer = require('nodemailer');
 const Review = require('./models/review');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 
 // Ensure uploads folder exists
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -34,10 +34,10 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// MongoDB connection via Mongoose
+// MongoDB connection via Mongoose with TLS options
 mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+  tls: true,
+  tlsAllowInvalidCertificates: true, // For testing only — remove in production
 })
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB error:', err));
