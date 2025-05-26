@@ -26,7 +26,7 @@ app.use('/uploads', express.static('uploads')); // Serve uploaded files
 // Multer storage for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Save files in /uploads folder
+    cb(null, 'uploads/');
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + file.originalname);
@@ -34,11 +34,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// MongoDB connection via Mongoose with TLS options
-mongoose.connect(process.env.MONGODB_URI, {
-  tls: true,
-  tlsAllowInvalidCertificates: true, // For testing only — remove in production
-})
+// MongoDB connection without TLS options
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB error:', err));
 
@@ -83,7 +80,7 @@ app.post('/api/reviews', upload.array('review-image', 3), async (req, res) => {
 
     await newReview.save();
 
-    // Prepare email notification
+    // Email notification
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_TO,
@@ -132,7 +129,12 @@ app.get('/api/reviews', async (req, res) => {
   }
 });
 
-// Start the server
+// Root route for sanity check
+app.get("/", (req, res) => {
+  res.send("✅ Backend is running.");
+});
+
+// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
