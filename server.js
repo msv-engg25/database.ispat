@@ -17,8 +17,15 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
 
+// ✅ CORS setup for GitHub Pages frontend
+const corsOptions = {
+  origin: 'https://msv-engg25.github.io', // GitHub Pages base domain
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+};
+app.use(cors(corsOptions));
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
@@ -34,7 +41,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// MongoDB connection without TLS options
+// MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB error:', err));
@@ -129,7 +136,7 @@ app.get('/api/reviews', async (req, res) => {
   }
 });
 
-// Root route for sanity check
+// Root route
 app.get("/", (req, res) => {
   res.send("✅ Backend is running.");
 });
